@@ -15,8 +15,9 @@ class Net:
         self.params = params
         self.device = device
 
-    def train(self, data):
-        n_epoch = self.params['n_epoch']
+    def train(self, data, n_epoch=None):
+        if n_epoch is None:
+            n_epoch = self.params['n_epoch']
         self.clf = self.net(self.params["num_classes"]).to(self.device)
         self.clf.train()
         optimizer = optim.SGD(self.clf.parameters(), **self.params['optimizer_args'])
