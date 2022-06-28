@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import torch
 from torchvision import datasets
 
@@ -39,22 +40,22 @@ class Data:
         return 1.0 * (self.Y_test==preds).sum().item() / self.n_test
 
 
-def get_MNIST(handler):
-    raw_train = datasets.MNIST('./data/MNIST', train=True, download=True)
-    raw_test = datasets.MNIST('./data/MNIST', train=False, download=True)
+def get_MNIST(handler, root):
+    raw_train = datasets.MNIST(os.path.join(root, 'data/MNIST'), train=True, download=True)
+    raw_test = datasets.MNIST(os.path.join(root, 'data/MNIST'), train=False, download=True)
     return Data(raw_train.data[:40000], raw_train.targets[:40000], raw_test.data[:40000], raw_test.targets[:40000], handler)
 
-def get_FashionMNIST(handler):
-    raw_train = datasets.FashionMNIST('./data/FashionMNIST', train=True, download=True)
-    raw_test = datasets.FashionMNIST('./data/FashionMNIST', train=False, download=True)
+def get_FashionMNIST(handler, root):
+    raw_train = datasets.FashionMNIST(os.path.join(root, 'data/FashionMNIST'), train=True, download=True)
+    raw_test = datasets.FashionMNIST(os.path.join(root, 'data/FashionMNIST'), train=False, download=True)
     return Data(raw_train.data[:40000], raw_train.targets[:40000], raw_test.data[:40000], raw_test.targets[:40000], handler)
 
-def get_SVHN(handler):
-    data_train = datasets.SVHN('./data/SVHN', split='train', download=True)
-    data_test = datasets.SVHN('./data/SVHN', split='test', download=True)
+def get_SVHN(handler, root):
+    data_train = datasets.SVHN(os.path.join(root, 'data/SVHN'), split='train', download=True)
+    data_test = datasets.SVHN(os.path.join(root, 'data/SVHN'), split='test', download=True)
     return Data(data_train.data[:40000], torch.from_numpy(data_train.labels)[:40000], data_test.data[:40000], torch.from_numpy(data_test.labels)[:40000], handler)
 
-def get_CIFAR10(handler):
-    data_train = datasets.CIFAR10('./data/CIFAR10', train=True, download=True)
-    data_test = datasets.CIFAR10('./data/CIFAR10', train=False, download=True)
+def get_CIFAR10(handler, root):
+    data_train = datasets.CIFAR10(os.path.join(root, 'data/CIFAR10'), train=True, download=True)
+    data_test = datasets.CIFAR10(os.path.join(root, 'data/CIFAR10'), train=False, download=True)
     return Data(data_train.data[:40000], torch.LongTensor(data_train.targets)[:40000], data_test.data[:40000], torch.LongTensor(data_test.targets)[:40000], handler)

@@ -45,17 +45,17 @@ def get_handler(name):
     elif name == 'resnet':
         return ResNet_Handler
 
-def get_dataset(name):
+def get_dataset(name, root):
     handler_name = name
     # handler_name = "resnet"
     if name == 'MNIST':
-         return get_MNIST(get_handler(handler_name))
+         return get_MNIST(get_handler(handler_name), root)
     elif name == 'FashionMNIST':
-        return get_FashionMNIST(get_handler(handler_name))
+        return get_FashionMNIST(get_handler(handler_name), root)
     elif name == 'SVHN':
-        return get_SVHN(get_handler(handler_name))
+        return get_SVHN(get_handler(handler_name), root)
     elif name == 'CIFAR10':
-        return get_CIFAR10(get_handler(handler_name))
+        return get_CIFAR10(get_handler(handler_name), root)
     else:
         raise NotImplementedError
         

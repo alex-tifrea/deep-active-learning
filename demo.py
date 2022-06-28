@@ -7,6 +7,7 @@ from pprint import pprint
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('--root', type=str, default=".", help="root")
     parser.add_argument('--seed', type=int, default=1, help="random seed")
     parser.add_argument('--n_init_labeled', type=int, default=10000, help="number of init labeled samples")
     parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    dataset = get_dataset(args.dataset_name)                   # load dataset
+    dataset = get_dataset(args.dataset_name, args.root)                   # load dataset
     net = get_net(args.dataset_name, device)                   # load network
     strategy = get_strategy(args.strategy_name)(dataset, net)  # load strategy
 
