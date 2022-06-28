@@ -38,7 +38,7 @@ class Data:
     def cal_test_acc(self, preds):
         return 1.0 * (self.Y_test==preds).sum().item() / self.n_test
 
-    
+
 def get_MNIST(handler):
     raw_train = datasets.MNIST('./data/MNIST', train=True, download=True)
     raw_test = datasets.MNIST('./data/MNIST', train=False, download=True)

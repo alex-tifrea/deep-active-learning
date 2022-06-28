@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn as nn
@@ -5,16 +6,18 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from torchvision import models
+
 
 class Net:
     def __init__(self, net, params, device):
         self.net = net
         self.params = params
         self.device = device
-        
+
     def train(self, data):
         n_epoch = self.params['n_epoch']
-        self.clf = self.net().to(self.device)
+        self.clf = self.net(self.params["num_classes"]).to(self.device)
         self.clf.train()
         optimizer = optim.SGD(self.clf.parameters(), **self.params['optimizer_args'])
 
@@ -89,16 +92,40 @@ class Net:
                 out, e1 = self.clf(x)
                 embeddings[idxs] = e1.cpu()
         return embeddings
-        
+
+class Identity(nn.Module):
+    def __init__(self):
+        super(Identity, self).__init__()
+
+    def forward(self, x):
+        return x
+
+class ResNet(nn.Module):
+    def __init__(self, num_classes):
+        super(ResNet, self).__init__()
+        self.num_classes = num_classes
+        self.net = models.resnet.resnet18(pretrained=True)
+        self.emb = deepcopy(self.net)
+        self.emb.fc = Identity()
+        self.net.fc = nn.Linear(512, self.num_classes)
+
+    def forward(self, x):
+        x = self.net(x)
+        # e1 = self.emb(x)
+        e1 = None
+        return x, e1
+
+    def get_embedding_dim(self):
+        return 512
 
 class MNIST_Net(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes):
         super(MNIST_Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
         self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
         self.conv2_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(320, 50)
-        self.fc2 = nn.Linear(50, 10)
+        self.fc2 = nn.Linear(50, num_classes)
 
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
@@ -113,7 +140,7 @@ class MNIST_Net(nn.Module):
         return 50
 
 class SVHN_Net(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes):
         super(SVHN_Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3)
         self.conv2 = nn.Conv2d(32, 32, kernel_size=3)
@@ -121,7 +148,7 @@ class SVHN_Net(nn.Module):
         self.conv3_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(1152, 400)
         self.fc2 = nn.Linear(400, 50)
-        self.fc3 = nn.Linear(50, 10)
+        self.fc3 = nn.Linear(50, num_classes)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
@@ -138,13 +165,13 @@ class SVHN_Net(nn.Module):
         return 50
 
 class CIFAR10_Net(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes):
         super(CIFAR10_Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=5)
         self.conv2 = nn.Conv2d(32, 32, kernel_size=5)
         self.conv3 = nn.Conv2d(32, 64, kernel_size=5)
         self.fc1 = nn.Linear(1024, 50)
-        self.fc2 = nn.Linear(50, 10)
+        self.fc2 = nn.Linear(50, num_classes)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
