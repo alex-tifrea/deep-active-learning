@@ -3,6 +3,7 @@ from copy import deepcopy
 import mlflow
 from lib_mlflow import retry, setup_mlflow
 import numpy as np
+import os
 import torch
 from utils import get_dataset, get_net, get_strategy
 from pprint import pprint
@@ -11,6 +12,7 @@ from pprint import pprint
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=str, default=".", help="root")
+    parser.add_argument('--ckpt_root', type=str, default=".", help="checkpoint root")
     parser.add_argument('--seed', type=int, default=1, help="random seed")
     parser.add_argument('--n_epoch', type=int, default=100, help="num epochs")
     parser.add_argument('--n_labeled', type=int, default=-1, help="number of labeled training samples")
@@ -49,14 +51,17 @@ if __name__ == "__main__":
         print(f"number of testing pool: {dataset.n_test}")
         print()
 
+        ckpt_root = os.path.join(args.ckpt_root, "ckpt/", f"{args.dataset_name}_{np.random.randint(1e10)}")
+
         mlflow.log_params({
             "n_labeled": n_labeled,
             "n_unlabeled": dataset.n_pool - n_labeled,
             "n_test": dataset.n_test,
+            "ckpt_root": ckpt_root,
         })
 
         print("Start fine-tuning")
-        strategy.train(args.n_epoch)
+        strategy.train(n_epochs=args.n_epoch, ckpt_root=ckpt_root)
 
         preds = strategy.predict(dataset.get_test_data())
         print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
