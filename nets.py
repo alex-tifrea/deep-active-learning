@@ -1,4 +1,5 @@
 from copy import deepcopy
+from lib_mlflow import retry
 import mlflow
 import numpy as np
 import os
@@ -35,10 +36,10 @@ class Net:
                 optimizer.step()
 
             train_preds = self.predict(data)
-            mlflow.log_metric("train_acc", self.calc_acc(train_preds, data.Y), step=epoch)
+            retry(lambda: mlflow.log_metric("train_acc", self.calc_acc(train_preds, data.Y), step=epoch))
             if test_data is not None:
                 test_preds = self.predict(test_data)
-                mlflow.log_metric("test_acc", self.calc_acc(test_preds, test_data.Y), step=epoch)
+                retry(lambda: mlflow.log_metric("test_acc", self.calc_acc(test_preds, test_data.Y), step=epoch))
 
             if ckpt_root is not None:
                 torch.save(self.clf, os.path.join(ckpt_root, f"{epoch}_ckpt.pth"))

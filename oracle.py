@@ -37,7 +37,7 @@ if __name__ == "__main__":
     with mlflow.start_run(run_name=run_name):
         params = deepcopy(vars(args))
         del params["n_labeled"]
-        mlflow.log_params(vars(args))
+        retry(lambda: mlflow.log_params(vars(args)))
 
         dataset = get_dataset(args.dataset_name, args.root)        # load dataset
         net = get_net(args.dataset_name, device)                   # load network
@@ -53,12 +53,12 @@ if __name__ == "__main__":
 
         ckpt_root = os.path.join(args.ckpt_root, "ckpt/", f"{args.dataset_name}_{np.random.randint(1e10)}")
 
-        mlflow.log_params({
+        retry(lambda: mlflow.log_params({
             "n_labeled": n_labeled,
             "n_unlabeled": dataset.n_pool - n_labeled,
             "n_test": dataset.n_test,
             "ckpt_root": ckpt_root,
-        })
+        }))
 
         print("Start fine-tuning")
         strategy.train(n_epochs=args.n_epoch, ckpt_root=ckpt_root)
