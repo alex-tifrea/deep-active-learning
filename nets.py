@@ -1,5 +1,7 @@
 from copy import deepcopy
+import mlflow
 import numpy as np
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,7 +17,7 @@ class Net:
         self.params = params
         self.device = device
 
-    def train(self, data, n_epoch=None):
+    def train(self, data, test_data=None, n_epoch=None, ckpt_root=None):
         if n_epoch is None:
             n_epoch = self.params['n_epoch']
         self.clf = self.net(self.params["num_classes"]).to(self.device)
@@ -31,6 +33,15 @@ class Net:
                 loss = F.cross_entropy(out, y)
                 loss.backward()
                 optimizer.step()
+
+            train_preds = self.predict(data)
+            mlflow.log_metric("train_acc", self.calc_acc(train_preds, data.Y), step=epoch)
+            if test_data is not None:
+                test_preds = self.predict(test_data)
+                mlflow.log_metric("test_acc", self.calc_acc(test_preds, test_data.Y), step=epoch)
+
+            if ckpt_root is not None:
+                torch.save(self.clf, os.path.join(ckpt_root, f"{epoch}_ckpt.pth"))
 
     def predict(self, data):
         self.clf.eval()
@@ -93,6 +104,10 @@ class Net:
                 out, e1 = self.clf(x)
                 embeddings[idxs] = e1.cpu()
         return embeddings
+
+    def calc_acc(self, preds, true_y):
+        return 1.0 * (true_y == preds).sum().item() / true_y.shape[0]
+
 
 class Identity(nn.Module):
     def __init__(self):

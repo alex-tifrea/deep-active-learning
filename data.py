@@ -40,6 +40,7 @@ class Data:
         return 1.0 * (self.Y_test==preds).sum().item() / self.n_test
 
 
+
 def get_MNIST(handler, root):
     raw_train = datasets.MNIST(os.path.join(root, 'data/MNIST'), train=True, download=True)
     raw_test = datasets.MNIST(os.path.join(root, 'data/MNIST'), train=False, download=True)

@@ -1,4 +1,7 @@
 import argparse
+from copy import deepcopy
+import mlflow
+from lib_mlflow import retry, setup_mlflow
 import numpy as np
 import torch
 from utils import get_dataset, get_net, get_strategy
@@ -21,24 +24,39 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.enabled = False
-
     # device
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    dataset = get_dataset(args.dataset_name, args.root)                   # load dataset
-    net = get_net(args.dataset_name, device)                   # load network
-    strategy = get_strategy("RandomSampling")(dataset, net)    # load strategy
+    setup_mlflow()
+    mlflow.set_experiment("finetuned_nn")
 
-    n_labeled = dataset.n_pool if args.n_labeled == -1 else args.n_labeled
-    # start experiment
-    dataset.initialize_labels(n_labeled)
-    print(f"number of labeled pool: {n_labeled}")
-    print(f"number of unlabeled pool: {dataset.n_pool-n_labeled}")
-    print(f"number of testing pool: {dataset.n_test}")
-    print()
+    run_name = f"{args.dataset_name}"
+    with mlflow.start_run(run_name=run_name):
+        params = deepcopy(vars(args))
+        del params["n_labeled"]
+        mlflow.log_params(vars(args))
 
-    print("Start fine-tuning")
-    strategy.train(args.n_epoch)
-    preds = strategy.predict(dataset.get_test_data())
-    print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
+        dataset = get_dataset(args.dataset_name, args.root)        # load dataset
+        net = get_net(args.dataset_name, device)                   # load network
+        strategy = get_strategy("RandomSampling")(dataset, net)    # load strategy
+
+        n_labeled = dataset.n_pool if args.n_labeled == -1 else args.n_labeled
+        # start experiment
+        dataset.initialize_labels(n_labeled)
+        print(f"number of labeled pool: {n_labeled}")
+        print(f"number of unlabeled pool: {dataset.n_pool-n_labeled}")
+        print(f"number of testing pool: {dataset.n_test}")
+        print()
+
+        mlflow.log_params({
+            "n_labeled": n_labeled,
+            "n_unlabeled": dataset.n_pool - n_labeled,
+            "n_test": dataset.n_test,
+        })
+
+        print("Start fine-tuning")
+        strategy.train(args.n_epoch)
+
+        preds = strategy.predict(dataset.get_test_data())
+        print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
