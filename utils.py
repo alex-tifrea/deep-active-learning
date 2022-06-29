@@ -9,52 +9,53 @@ from query_strategies import RandomSampling, LeastConfidence, MarginSampling, En
                              KMeansSampling, KCenterGreedy, BALDDropout, \
                              AdversarialBIM, AdversarialDeepFool
 
+batch_size=128
 params = {'MNIST':
               {'n_epoch': 10,
                'num_classes': 10,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': 64},
+               'test_args':{'batch_size': 1000},
                'optimizer_args':{'lr': 0.01, 'momentum': 0.5}},
           'FashionMNIST':
               {'n_epoch': 10,
                'num_classes': 10,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': 64},
+               'test_args':{'batch_size': 1000},
                'optimizer_args':{'lr': 0.01, 'momentum': 0.5}},
           'SVHN':
               {'n_epoch': 20,
                'num_classes': 10,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': batch_size},
+               'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.01, 'momentum': 0.5}},
                'optimizer_args':{'lr': 0.005, 'momentum': 0.9}}, # SGD
           'CIFAR10':
               {'n_epoch': 20,
                'num_classes': 10,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': batch_size},
+               'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}
                'optimizer_args':{'lr': 0.005, 'momentum': 0.9}}, # SGD
 #                'optimizer_args':{'lr': 0.01}} # Adam
           'CIFAR100':
               {'n_epoch': 20,
                'num_classes': 100,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': batch_size},
+               'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}
                'optimizer_args':{'lr': 0.005, 'momentum': 0.9}}, # SGD
           'EuroSAT':
               {'n_epoch': 20,
                'num_classes': 100,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': batch_size},
+               'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}
                'optimizer_args':{'lr': 0.001, 'momentum': 0.9}}, # SGD
           'PCAM':
               {'n_epoch': 20,
                'num_classes': 100,
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': batch_size},
+               'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}
                'optimizer_args':{'lr': 0.001, 'momentum': 0.9}}, # SGD
           }
