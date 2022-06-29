@@ -1,10 +1,11 @@
+import torchvision.transforms as transforms
 import numpy as np
 from torchvision import transforms
 from torch.utils.data import Dataset
 from PIL import Image
 
 RESNET_INPUT_SIZE = 224
-transforms = {
+data_transforms = {
     "train": transforms.Compose(
         [
             transforms.Resize(RESNET_INPUT_SIZE),
@@ -47,7 +48,7 @@ class SVHN_Handler(Dataset):
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        self.transform = transforms["train"]
+        self.transform = data_transforms["train"]
         # self.transform = transforms.Compose(
         #     [
         #         transforms.ToTensor(),
@@ -71,7 +72,7 @@ class CIFAR10_Handler(Dataset):
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        self.transform = transforms["train"]
+        self.transform = data_transforms["train"]
         # self.transform = transforms.Compose(
         #     [
         #         transforms.ToTensor(),
@@ -95,7 +96,7 @@ class CIFAR100_Handler(Dataset):
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        self.transform = transforms["train"]
+        self.transform = data_transforms["train"]
 
     def __getitem__(self, index):
         x, y = self.X[index], self.Y[index]
@@ -111,7 +112,7 @@ class EuroSAT_Handler(Dataset):
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        self.transform = transforms["train"]
+        self.transform = data_transforms["train"]
 
     def __getitem__(self, index):
         x, y = self.X[index], self.Y[index]
@@ -127,7 +128,7 @@ class PCAM_Handler(Dataset):
     def __init__(self, X, Y):
         self.X = X
         self.Y = Y
-        self.transform = transforms["train"]
+        self.transform = data_transforms["train"]
 
     def __getitem__(self, index):
         x, y = self.X[index], self.Y[index]

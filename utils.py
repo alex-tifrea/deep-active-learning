@@ -1,4 +1,6 @@
-from torchvision import transforms
+import pandas as pd
+import mlflow
+from lib_mlflow import *
 from handlers import MNIST_Handler, SVHN_Handler, CIFAR10_Handler, CIFAR100_Handler, EuroSAT_Handler, PCAM_Handler
 from data import get_MNIST, get_FashionMNIST, get_SVHN, get_CIFAR10, get_CIFAR100, get_EuroSAT, get_PCAM
 from nets import Net, MNIST_Net, SVHN_Net, CIFAR10_Net, ResNet
@@ -72,12 +74,9 @@ def get_handler(name):
         return EuroSAT_Handler
     elif name == 'PCAM':
         return PCAM_Handler
-    elif name == 'resnet':
-        return ResNet_Handler
 
 def get_dataset(name, root):
     handler_name = name
-    # handler_name = "resnet"
     if name == 'MNIST':
          return get_MNIST(get_handler(handler_name), root)
     elif name == 'FashionMNIST':
@@ -96,9 +95,14 @@ def get_dataset(name, root):
         raise NotImplementedError
 
 def get_net(name, device):
+    curr_params = pd.json_normalize(params[name], sep='_')
+    curr_params = curr_params.to_dict(orient='records')[0]
+    del curr_params["n_epoch"]
+    print(curr_params)
+    retry(lambda: mlflow.log_params(curr_params))
     if name == 'MNIST':
-        # return Net(MNIST_Net, params[name], device)
-        return Net(ResNet, params[name], device)
+        return Net(MNIST_Net, params[name], device)
+        # return Net(ResNet, params[name], device)
     elif name == 'FashionMNIST':
         return Net(MNIST_Net, params[name], device)
     elif name == 'SVHN':

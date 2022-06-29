@@ -17,10 +17,10 @@ class Strategy:
         if neg_idxs:
             self.dataset.labeled_idxs[neg_idxs] = False
 
-    def train(self, n_epoch=None, ckpt_root=None):
+    def train(self, n_epoch=None, ckpt_root=None, n_round=None):
         labeled_idxs, labeled_data = self.dataset.get_labeled_data()
         test_data = self.dataset.get_test_data()
-        self.net.train(labeled_data, test_data=test_data, n_epoch=n_epoch, ckpt_root=ckpt_root)
+        self.net.train(labeled_data, test_data=test_data, n_epoch=n_epoch, ckpt_root=ckpt_root, n_round=n_round)
 
     def predict(self, data):
         preds = self.net.predict(data)

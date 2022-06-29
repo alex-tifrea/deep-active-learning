@@ -18,7 +18,7 @@ class Net:
         self.params = params
         self.device = device
 
-    def train(self, data, test_data=None, n_epoch=None, ckpt_root=None):
+    def train(self, data, test_data=None, n_epoch=None, ckpt_root=None, n_round=None):
         if n_epoch is None:
             n_epoch = self.params['n_epoch']
         self.clf = self.net(self.params["num_classes"]).to(self.device)
@@ -38,10 +38,14 @@ class Net:
                 losses.update(loss.item(), x.size(0))
 
             train_preds = self.predict(data)
-            retry(lambda: mlflow.log_metric("train_acc", self.calc_acc(train_preds, data.Y), step=epoch))
+            retry(lambda: mlflow.log_metric(
+                  f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}train_err",
+                  1. - self.calc_acc(train_preds, data.Y), step=epoch))
             if test_data is not None:
                 test_preds = self.predict(test_data)
-                retry(lambda: mlflow.log_metric("test_acc", self.calc_acc(test_preds, test_data.Y), step=epoch))
+                retry(lambda: mlflow.log_metric(
+                    f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}test_err",
+                    1. - self.calc_acc(test_preds, test_data.Y), step=epoch))
 
             if ckpt_root is not None:
                 torch.save(self.clf, os.path.join(ckpt_root, f"{epoch}_ckpt.pth"))
