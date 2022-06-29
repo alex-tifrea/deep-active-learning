@@ -37,6 +37,9 @@ class Data:
     def get_test_data(self):
         return self.handler(self.X_test, self.Y_test)
 
+    def cal_labeled_acc(self, preds, labeled_idxs):
+        return 1.0 * (self.Y_train[labeled_idxs] == preds).sum().item() / len(labeled_idxs)
+
     def cal_test_acc(self, preds):
         return 1.0 * (self.Y_test==preds).sum().item() / self.n_test
 

@@ -71,10 +71,15 @@ if __name__ == "__main__":
         # round 0 accuracy
         print("Round 0")
         strategy.train(n_epoch=args.n_epoch, n_round=0)
-        preds = strategy.predict(dataset.get_test_data())
-        test_acc = dataset.cal_test_acc(preds)
-        print(f"Round 0 testing accuracy: {test_acc}")
+        labeled_idxs, labeled_data = dataset.get_labeled_data()
+        train_preds = strategy.predict(labeled_data)
+        train_acc = dataset.cal_labeled_acc(train_preds, labeled_idxs)
+
+        test_preds = strategy.predict(dataset.get_test_data())
+        test_acc = dataset.cal_test_acc(test_preds)
+        print(f"Round 0: train_acc={train_acc}; test_acc={test_acc}")
         retry(lambda: mlflow.log_metric("test_acc", test_acc, step=0))
+        retry(lambda: mlflow.log_metric("train_acc", train_acc, step=0))
 
         for rd in range(1, args.n_round+1):
             print(f"Round {rd}")
@@ -87,7 +92,12 @@ if __name__ == "__main__":
             strategy.train(n_epoch=args.n_epoch, n_round=rd)
 
             # calculate accuracy
-            preds = strategy.predict(dataset.get_test_data())
-            test_acc = dataset.cal_test_acc(preds)
-            print(f"Round {rd} testing accuracy: {test_acc}")
+            labeled_idxs, labeled_data = dataset.get_labeled_data()
+            train_preds = strategy.predict(labeled_data)
+            train_acc = dataset.cal_labeled_acc(train_preds, labeled_idxs)
+
+            test_preds = strategy.predict(dataset.get_test_data())
+            test_acc = dataset.cal_test_acc(test_preds)
+            print(f"Round {rd}: train_acc={train_acc}; test_acc={test_acc}")
             retry(lambda: mlflow.log_metric("test_acc", test_acc, step=rd))
+            retry(lambda: mlflow.log_metric("train_acc", train_acc, step=rd))
