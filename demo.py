@@ -71,8 +71,9 @@ if __name__ == "__main__":
         print("Round 0")
         strategy.train(n_epoch=args.n_epoch, n_round=0)
         preds = strategy.predict(dataset.get_test_data())
-        print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
-        retry(lambda: mlflow.log_metric("test_err", 1. - dataset.calc_test_acc(preds), step=0))
+        test_acc = dataset.cal_test_acc(preds)
+        print(f"Round 0 testing accuracy: {test_acc}")
+        retry(lambda: mlflow.log_metric("test_err", 1. - test_acc, step=0))
 
         for rd in range(1, args.n_round+1):
             print(f"Round {rd}")
@@ -86,5 +87,6 @@ if __name__ == "__main__":
 
             # calculate accuracy
             preds = strategy.predict(dataset.get_test_data())
-            print(f"Round {rd} testing accuracy: {dataset.cal_test_acc(preds)}")
-            retry(lambda: mlflow.log_metric("test_err", 1. - dataset.calc_test_acc(preds), step=rd))
+            test_acc = dataset.cal_test_acc(preds)
+            print(f"Round {rd} testing accuracy: {test_acc}")
+            retry(lambda: mlflow.log_metric("test_err", 1. - test_acc, step=rd))
