@@ -39,13 +39,13 @@ class Net:
 
             train_preds = self.predict(data)
             retry(lambda: mlflow.log_metric(
-                  f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}train_err",
-                  1. - self.calc_acc(train_preds, data.Y), step=epoch))
+                  f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}train_acc",
+                  self.calc_acc(train_preds, data.Y), step=epoch))
             if test_data is not None:
                 test_preds = self.predict(test_data)
                 retry(lambda: mlflow.log_metric(
-                    f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}test_err",
-                    1. - self.calc_acc(test_preds, test_data.Y), step=epoch))
+                    f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}test_acc",
+                    self.calc_acc(test_preds, test_data.Y), step=epoch))
 
             if ckpt_root is not None:
                 torch.save(self.clf, os.path.join(ckpt_root, f"{epoch}_ckpt.pth"))
