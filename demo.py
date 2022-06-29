@@ -11,6 +11,7 @@ from pprint import pprint
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=str, default=".", help="root")
+    parser.add_argument('--log_file', type=str, default="", help="log file")
     parser.add_argument('--seed', type=int, default=1, help="random seed")
     parser.add_argument('--n_init_labeled', type=int, default=10000, help="number of init labeled samples")
     parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
