@@ -7,8 +7,10 @@ RESNET_INPUT_SIZE = 224
 transforms = {
     "train": transforms.Compose(
         [
-            transforms.RandomResizedCrop(RESNET_INPUT_SIZE),
-            transforms.RandomHorizontalFlip(),
+            transforms.Resize(RESNET_INPUT_SIZE),
+            transforms.CenterCrop(RESNET_INPUT_SIZE),
+#             transforms.RandomResizedCrop(RESNET_INPUT_SIZE),
+#             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
@@ -78,6 +80,54 @@ class CIFAR10_Handler(Dataset):
         #         ),
         #     ]
         # )
+
+    def __getitem__(self, index):
+        x, y = self.X[index], self.Y[index]
+        x = Image.fromarray(x)
+        x = self.transform(x)
+        return x, y, index
+
+    def __len__(self):
+        return len(self.X)
+
+
+class CIFAR100_Handler(Dataset):
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+        self.transform = transforms["train"]
+
+    def __getitem__(self, index):
+        x, y = self.X[index], self.Y[index]
+        x = Image.fromarray(x)
+        x = self.transform(x)
+        return x, y, index
+
+    def __len__(self):
+        return len(self.X)
+
+
+class EuroSAT_Handler(Dataset):
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+        self.transform = transforms["train"]
+
+    def __getitem__(self, index):
+        x, y = self.X[index], self.Y[index]
+        x = Image.fromarray(x)
+        x = self.transform(x)
+        return x, y, index
+
+    def __len__(self):
+        return len(self.X)
+
+
+class PCAM_Handler(Dataset):
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+        self.transform = transforms["train"]
 
     def __getitem__(self, index):
         x, y = self.X[index], self.Y[index]

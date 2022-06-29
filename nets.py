@@ -26,6 +26,7 @@ class Net:
 
         loader = DataLoader(data, shuffle=True, **self.params['train_args'])
         for epoch in tqdm(range(1, n_epoch+1), ncols=100):
+            losses = AverageMeter('Loss', ':.4e')
             for batch_idx, (x, y, idxs) in enumerate(loader):
                 x, y = x.to(self.device), y.to(self.device)
                 optimizer.zero_grad()
@@ -33,6 +34,7 @@ class Net:
                 loss = F.cross_entropy(out, y)
                 loss.backward()
                 optimizer.step()
+                losses.update(loss.item(), x.size(0))
 
             train_preds = self.predict(data)
             mlflow.log_metric("train_acc", self.calc_acc(train_preds, data.Y), step=epoch)
@@ -54,7 +56,7 @@ class Net:
                 pred = out.max(1)[1]
                 preds[idxs] = pred.cpu()
         return preds
-    
+
     def predict_prob(self, data):
         self.clf.eval()
         probs = torch.zeros([len(data), len(np.unique(data.Y))])
@@ -66,7 +68,7 @@ class Net:
                 prob = F.softmax(out, dim=1)
                 probs[idxs] = prob.cpu()
         return probs
-    
+
     def predict_prob_dropout(self, data, n_drop=10):
         self.clf.train()
         probs = torch.zeros([len(data), len(np.unique(data.Y))])
@@ -80,7 +82,7 @@ class Net:
                     probs[idxs] += prob.cpu()
         probs /= n_drop
         return probs
-    
+
     def predict_prob_dropout_split(self, data, n_drop=10):
         self.clf.train()
         probs = torch.zeros([n_drop, len(data), len(np.unique(data.Y))])
@@ -93,7 +95,7 @@ class Net:
                     prob = F.softmax(out, dim=1)
                     probs[i][idxs] += F.softmax(out, dim=1).cpu()
         return probs
-    
+
     def get_embeddings(self, data):
         self.clf.eval()
         embeddings = torch.zeros([len(data), self.clf.get_embedding_dim()])
@@ -201,3 +203,26 @@ class CIFAR10_Net(nn.Module):
 
     def get_embedding_dim(self):
         return 50
+
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
