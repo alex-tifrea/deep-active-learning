@@ -41,7 +41,7 @@ if __name__ == "__main__":
         params = deepcopy(vars(args))
         del params["n_labeled"]
         del params["ckpt_root"]
-        mlflow.log_params(params)
+        retry(lambda: mlflow.log_params(params))
 
         dataset = get_dataset(args.dataset_name, args.root)        # load dataset
         net = get_net(args.dataset_name, device)                   # load network
@@ -59,12 +59,12 @@ if __name__ == "__main__":
         ckpt_root = os.path.join(args.ckpt_root, "ckpt/", f"{args.dataset_name}_{np.random.randint(1e10)}")
         os.makedirs(ckpt_root, exist_ok=True)
 
-        mlflow.log_params({
+        retry(lambda: mlflow.log_params({
             "n_labeled": n_labeled,
             "n_unlabeled": dataset.n_pool - n_labeled,
             "n_test": dataset.n_test,
             "ckpt_root": ckpt_root,
-        })
+        }))
 
         print("Start fine-tuning")
         strategy.train(n_epoch=args.n_epoch, ckpt_root=ckpt_root)
