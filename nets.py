@@ -113,6 +113,10 @@ class Net:
                 embeddings[idxs] = e1.cpu()
         return embeddings
 
+    def load_ckpt(self, ckpt_path):
+        self.clf = torch.load(ckpt_path)
+
+
     def calc_acc(self, preds, true_y):
         return 1.0 * (true_y == preds).sum().item() / true_y.shape[0]
 
