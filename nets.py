@@ -37,16 +37,17 @@ class Net:
                 optimizer.step()
 #                 losses.update(loss.item(), x.size(0))
 
-#             if epoch % 5 == 0:
-#                 train_preds = self.predict(data)
-#                 retry(lambda: mlflow.log_metric(
-#                       f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}train_acc",
-#                       self.calc_acc(train_preds, data.Y), step=epoch))
-#                 if test_data is not None:
-#                     test_preds = self.predict(test_data)
-#                     retry(lambda: mlflow.log_metric(
-#                         f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}test_acc",
-#                         self.calc_acc(test_preds, test_data.Y), step=epoch))
+            # Only log train and test error after every epoch is we are training the oracle on the whole dataset.
+            if n_round is None:
+                train_preds = self.predict(data)
+                retry(lambda: mlflow.log_metric(
+                      f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}train_acc",
+                      self.calc_acc(train_preds, data.Y), step=epoch))
+                if test_data is not None:
+                    test_preds = self.predict(test_data)
+                    retry(lambda: mlflow.log_metric(
+                        f"{'' if n_round is None else 'rd_'+str(n_round)+'_'}test_acc",
+                        self.calc_acc(test_preds, test_data.Y), step=epoch))
 
             if ckpt_root is not None:
                 torch.save(self.clf, os.path.join(ckpt_root, f"{epoch}_ckpt.pth"))
