@@ -46,14 +46,14 @@ params = {'MNIST':
                'optimizer_args':{'lr': 0.005, 'momentum': 0.9}}, # SGD
           'EuroSAT':
               {'n_epoch': 20,
-               'num_classes': 100,
+               'num_classes': 10,
                'train_args':{'batch_size': batch_size},
                'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}
                'optimizer_args':{'lr': 0.001, 'momentum': 0.9}}, # SGD
           'PCAM':
               {'n_epoch': 20,
-               'num_classes': 100,
+               'num_classes': 2,
                'train_args':{'batch_size': batch_size},
                'test_args':{'batch_size': 1000},
 #                'optimizer_args':{'lr': 0.05, 'momentum': 0.3}}

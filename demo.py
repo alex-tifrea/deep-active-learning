@@ -17,7 +17,9 @@ if __name__ == "__main__":
     parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
     parser.add_argument('--n_epoch', type=int, default=20, help="num epochs")
     parser.add_argument('--n_round', type=int, default=10, help="number of rounds")
-    parser.add_argument('--dataset_name', type=str, default="MNIST", choices=["MNIST", "FashionMNIST", "SVHN", "CIFAR10"], help="dataset")
+    parser.add_argument('--dataset_name', type=str, default="MNIST",
+            choices=["MNIST", "FashionMNIST", "SVHN", "CIFAR10", "CIFAR100",
+            "PCAM", "EuroSAT"], help="dataset")
     parser.add_argument('--strategy_name', type=str, default="RandomSampling",
                         choices=["RandomSampling",
                                  "LeastConfidence",
@@ -47,7 +49,7 @@ if __name__ == "__main__":
     setup_mlflow()
     mlflow.set_experiment("al_vs_pl_nn")
 
-    run_name = f"{args.dataset_name}"
+    run_name = f"{args.dataset_name}_{args.strategy_name}"
     with mlflow.start_run(run_name=run_name):
         params = deepcopy(vars(args))
         retry(lambda: mlflow.log_params(params))
