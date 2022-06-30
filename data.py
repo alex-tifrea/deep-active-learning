@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pickle
 import torch
 from torchvision import datasets
 from torch.utils.data import Subset
@@ -14,6 +15,7 @@ class Data:
 
         self.n_pool = len(X_train)
         self.n_test = len(X_test)
+        self.confidences = None
 
         self.labeled_idxs = np.zeros(self.n_pool, dtype=bool)
 
@@ -22,6 +24,10 @@ class Data:
         tmp_idxs = np.arange(self.n_pool)
         np.random.shuffle(tmp_idxs)
         self.labeled_idxs[tmp_idxs[:num]] = True
+
+    def load_confidences(self, confidences_path):
+        with open(confidences_path, 'rb') as f:
+            self.confidences = pickle.load(f)
 
     def get_labeled_data(self):
         labeled_idxs = np.arange(self.n_pool)[self.labeled_idxs]

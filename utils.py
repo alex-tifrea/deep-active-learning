@@ -7,7 +7,7 @@ from nets import Net, MNIST_Net, SVHN_Net, CIFAR10_Net, ResNet
 from query_strategies import RandomSampling, LeastConfidence, MarginSampling, EntropySampling, \
                              LeastConfidenceDropout, MarginSamplingDropout, EntropySamplingDropout, \
                              KMeansSampling, KCenterGreedy, BALDDropout, \
-                             AdversarialBIM, AdversarialDeepFool
+                             AdversarialBIM, AdversarialDeepFool, OracleUncertainty
 
 batch_size=128
 params = {'MNIST':
@@ -125,6 +125,8 @@ def get_strategy(name):
         return RandomSampling
     elif name == "LeastConfidence":
         return LeastConfidence
+    elif name == "OracleUncertainty":
+        return OracleUncertainty
     elif name == "MarginSampling":
         return MarginSampling
     elif name == "EntropySampling":

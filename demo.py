@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=str, default=".", help="root")
     parser.add_argument('--log_file', type=str, default="", help="log file")
+    parser.add_argument('--confidences_file', type=str, default=None, help="oracle confidences file")
     parser.add_argument('--seed', type=int, default=1, help="random seed")
     parser.add_argument('--n_init_labeled', type=int, default=10000, help="number of init labeled samples")
     parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--strategy_name', type=str, default="RandomSampling",
                         choices=["RandomSampling",
                                  "LeastConfidence",
+                                 "OracleUncertainty",
                                  "MarginSampling",
                                  "EntropySampling",
                                  "LeastConfidenceDropout",
@@ -57,6 +59,10 @@ if __name__ == "__main__":
         dataset = get_dataset(args.dataset_name, args.root)        # load dataset
         net = get_net(args.dataset_name, device)                   # load network
         strategy = get_strategy(args.strategy_name)(dataset, net)  # load strategy
+
+        if args.strategy == "OracleUncertainty":
+            assert args.confidences_file is not None
+            dataset.load_confidences(args.confidences_file)
 
         # start experiment
         dataset.initialize_labels(args.n_init_labeled)
