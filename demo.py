@@ -1,6 +1,8 @@
 from copy import deepcopy
 import argparse
 import mlflow
+
+import utils
 from lib_mlflow import retry, setup_mlflow
 import numpy as np
 import torch
@@ -12,7 +14,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=str, default=".", help="root")
     parser.add_argument('--log_file', type=str, default="", help="log file")
-    parser.add_argument('--confidences_file', type=str, default=None, help="oracle confidences file")
     parser.add_argument('--seed', type=int, default=1, help="random seed")
     parser.add_argument('--n_init_labeled', type=int, default=10000, help="number of init labeled samples")
     parser.add_argument('--n_query', type=int, default=1000, help="number of queries per round")
@@ -61,8 +62,9 @@ if __name__ == "__main__":
         strategy = get_strategy(args.strategy_name)(dataset, net)  # load strategy
 
         if args.strategy == "OracleUncertainty":
-            assert args.confidences_file is not None
-            dataset.load_confidences(args.confidences_file)
+            confidences_file = utils.get_confidences_file(args.root, args.dataset_name)
+            print(f"Load confidences from {confidences_file}")
+            dataset.load_confidences(confidences_file)
 
         # start experiment
         dataset.initialize_labels(args.n_init_labeled)

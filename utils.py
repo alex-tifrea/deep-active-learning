@@ -153,3 +153,8 @@ def get_strategy(name):
 # albl_list = [MarginSampling(X_tr, Y_tr, idxs_lb, net, handler, args),
 #              KMeansSampling(X_tr, Y_tr, idxs_lb, net, handler, args)]
 # strategy = ActiveLearningByLearning(X_tr, Y_tr, idxs_lb, net, handler, args, strategy_list=albl_list, delta=0.1)
+
+def get_confidences_file(root, dataset):
+    if dataset not in ["CIFAR10", "CIFAR100", "SVHN", "EuroSAT", "PCAM"]:
+        raise RuntimeError(f"Dataset {dataset} not supported for oracle uncertainty")
+    return os.path.join(root, f"data/{dataset}/confidences.pkl")
