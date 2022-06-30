@@ -30,14 +30,15 @@ if __name__ == "__main__":
     num_repetitions = 10
 #     num_repetitions = 1
     strategy_names = [
-        "LeastConfidence",
-        "RandomSampling",
+#         "LeastConfidence",
+#         "RandomSampling",
+        "OracleUncertainty",
     ]
     datasets = [
-#         "CIFAR10",
-#         "SVHN",
-#         "CIFAR100",
-#         "EuroSAT",
+        "CIFAR10",
+        "SVHN",
+        "CIFAR100",
+        "EuroSAT",
         "PCAM",
     ]
 

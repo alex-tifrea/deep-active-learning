@@ -61,7 +61,7 @@ if __name__ == "__main__":
         net = get_net(args.dataset_name, device)                   # load network
         strategy = get_strategy(args.strategy_name)(dataset, net)  # load strategy
 
-        if args.strategy == "OracleUncertainty":
+        if args.strategy_name == "OracleUncertainty":
             confidences_file = utils.get_confidences_file(args.root, args.dataset_name)
             print(f"Load confidences from {confidences_file}")
             dataset.load_confidences(confidences_file)
